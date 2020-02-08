@@ -5,14 +5,18 @@ import Auxilary from '../Auxilary/Auxilary';
 const withErrorHandler = (WrappedComponent, axios) => {
     return class extends Component {
         state = {
-            error: null
+            error: null,
+        }
+        componentWillUnmount(){
+            axios.interceptors.request.eject(this.requestInterceptors);
+            axios.interceptors.response.eject(this.responseInterceptors);
         }
         componentDidMount(){
-            axios.interceptors.request.use(req => {
+            this.requestInterceptors = axios.interceptors.request.use(req => {
                 this.setState({error: null});
                 return req;
             });
-            axios.interceptors.response.use(resp=> resp,error => {
+            this.responseInterceptors = axios.interceptors.response.use(resp=> resp,error => {
                 this.setState({error: error});                
             });
         }
